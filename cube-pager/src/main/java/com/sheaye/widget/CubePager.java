@@ -25,7 +25,7 @@ import java.util.TimerTask;
 
 public class CubePager extends ViewGroup {
 
-    private static final String TAG = "SolidPager";
+    private static final String TAG = "CubePager";
     private static final int SCROLL_TO_LEFT = 1;
     private static final int SCROLL_TO_RIGHT = -1;
     private int mScrollDirect;
@@ -43,7 +43,6 @@ public class CubePager extends ViewGroup {
     private int mTouchSlop;
     private float mLastMoveX;
     private float mMoveX;
-    private int mMaxX;
     private int mWidth;
     private int mHeight;
     private int mLeftPosition;
@@ -57,7 +56,6 @@ public class CubePager extends ViewGroup {
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
-            Log.e(TAG, "message...");
             moveToNextPage();
         }
     };
@@ -108,7 +106,6 @@ public class CubePager extends ViewGroup {
         removeAllViews();
         mPagerAdapter = pagerAdapter;
         mItemsCount = mPagerAdapter.getCount();
-        mMaxX = getMeasuredWidth() * (mItemsCount - 1);
         if (mItemsCount == 0) {
             return;
         }
@@ -195,21 +192,25 @@ public class CubePager extends ViewGroup {
     }
 
     private void updateLayout(int scrollDirect) {
+        int oldPosition = mCurrentPosition;
         switch (scrollDirect) {
             case SCROLL_TO_RIGHT:
                 mPagerAdapter.destroyItem(this, mLeftPosition, getChildAt(0));
-                mLeftPosition = mCurrentPosition;
+                mLeftPosition = oldPosition;
                 mCurrentPosition = mRightPosition;
                 mRightPosition = (mRightPosition + 1) % mItemsCount;
                 addView(((View) mPagerAdapter.instantiateItem(this, mRightPosition)), 2);
                 break;
             case SCROLL_TO_LEFT:
                 mPagerAdapter.destroyItem(this, mRightPosition, getChildAt(2));
-                mRightPosition = mCurrentPosition;
+                mRightPosition = oldPosition;
                 mCurrentPosition = mLeftPosition;
                 mLeftPosition = (mLeftPosition + mItemsCount - 1) % mItemsCount;
                 addView(((View) mPagerAdapter.instantiateItem(this, mLeftPosition)), 0);
                 break;
+        }
+        if (mOnPageChangeListener != null) {
+            mOnPageChangeListener.onPageChanged(mCurrentPosition, oldPosition);
         }
 //      mScrollDirect 左滑1,右滑-1,其他0
         int startX = getScrollX() + this.mScrollDirect * mWidth;
@@ -289,7 +290,7 @@ public class CubePager extends ViewGroup {
 
     private void moveToNextPage() {
 //      仿照onTouchEvent完成前半部分的动作
-        mScroller.startScroll(0,0,-mScrollDirect * mWidth / 2,0);
+        mScroller.startScroll(0, 0, -mScrollDirect * mWidth / 2, 0);
         invalidate();
         updateLayout(mScrollDirect);
     }
@@ -301,5 +302,19 @@ public class CubePager extends ViewGroup {
             mTimer.cancel();
             mTimer = null;
         }
+    }
+
+    public interface OnPageChangeListener {
+        void onPageChanged(int currentPosition, int oldPosition);
+    }
+
+    private OnPageChangeListener mOnPageChangeListener;
+
+    public void setOnPageChangeListener(OnPageChangeListener onPageChangeListener) {
+        mOnPageChangeListener = onPageChangeListener;
+    }
+
+    public int getItemsCount() {
+        return mItemsCount;
     }
 }

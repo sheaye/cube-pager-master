@@ -9,6 +9,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 
 import com.sheaye.widget.CubePager;
+import com.sheaye.widget.DotsLayout;
 
 import java.util.ArrayList;
 
@@ -17,12 +18,14 @@ public class MainActivity extends AppCompatActivity {
     protected CubePager mCubePager;
     private ArrayList<ImageView> mImageViews;
     private int[] pics = {R.drawable.pic1, R.drawable.pic2, R.drawable.pic3, R.drawable.pic4};
+    protected DotsLayout mDotsLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         mCubePager = ((CubePager) findViewById(R.id.m_cube_pager));
+        mDotsLayout = ((DotsLayout) findViewById(R.id.m_dots_layout));
         mImageViews = new ArrayList<>();
         for (int i = 0; i < pics.length; i++) {
             ImageView imageView = new ImageView(this);
@@ -33,6 +36,7 @@ public class MainActivity extends AppCompatActivity {
         }
         mCubePager.setAutoMove(true);
         mCubePager.setAdapter(new PicAdapter());
+        mDotsLayout.setUpWithCubePager(mCubePager);
     }
 
     class PicAdapter extends PagerAdapter {

@@ -1,12 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:layout_height="wrap_content">
 
-    <com.sheaye.widget.CubePager
-        android:id="@+id/m_cube_pager"
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="250dp"/>
+        android:layout_height="wrap_content">
 
-</LinearLayout>
+        <com.sheaye.widget.CubePager
+            android:id="@+id/m_cube_pager"
+            android:layout_width="match_parent"
+            android:layout_height="250dp"/>
+
+        <com.sheaye.widget.DotsLayout
+            android:id="@+id/m_dots_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="10dp"
+            android:layout_gravity="bottom"/>
+
+    </FrameLayout>
+
+</RelativeLayout>
