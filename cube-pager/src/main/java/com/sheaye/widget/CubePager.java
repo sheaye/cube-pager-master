@@ -1,6 +1,7 @@
 package com.sheaye.widget;
 
 import android.content.Context;
+import android.database.DataSetObserver;
 import android.graphics.Camera;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
@@ -29,7 +30,7 @@ public class CubePager extends ViewGroup {
     private static final int SCROLL_TO_LEFT = 1;
     private static final int SCROLL_TO_RIGHT = -1;
     private int mScrollDirect;
-    private PagerAdapter mPagerAdapter;
+    private CubePagerAdapter mPagerAdapter;
     private int mItemsCount;
     private Interpolator mInterpolator = new Interpolator() {
         @Override
@@ -51,6 +52,7 @@ public class CubePager extends ViewGroup {
     private Camera mCamera;
     private static float MAX_ROTATE = 50;
     private Matrix mMatrix;
+    private CubeObserver mObserver;
 
     private Handler mHandler = new Handler() {
         @Override
@@ -102,25 +104,13 @@ public class CubePager extends ViewGroup {
         }
     }
 
-    public void setAdapter(PagerAdapter pagerAdapter) {
-        removeAllViews();
+    public void setAdapter(CubePagerAdapter pagerAdapter) {
         mPagerAdapter = pagerAdapter;
-        mItemsCount = mPagerAdapter.getCount();
-        if (mItemsCount == 0) {
-            return;
+        if (mObserver == null) {
+            mObserver = new CubeObserver();
         }
-        if (mItemsCount > 2) {
-            mLeftPosition = mItemsCount - 1;
-            mCurrentPosition = 0;
-            mRightPosition = 1;
-            addView(((View) mPagerAdapter.instantiateItem(this, mLeftPosition)), 0);
-            addView(((View) mPagerAdapter.instantiateItem(this, mCurrentPosition)), 1);
-            addView(((View) mPagerAdapter.instantiateItem(this, mRightPosition)), 2);
-        }
-        requestLayout();
-        if (mAutoMove) {
-            startTimer();
-        }
+        mPagerAdapter.setCubeObserver(mObserver);
+        onDataSetChanged();
     }
 
     //  水平拖动的距离超过双击距离，则拦截MOVE事件交给onTouchEvent处理
@@ -199,14 +189,14 @@ public class CubePager extends ViewGroup {
                 mLeftPosition = oldPosition;
                 mCurrentPosition = mRightPosition;
                 mRightPosition = (mRightPosition + 1) % mItemsCount;
-                addView(((View) mPagerAdapter.instantiateItem(this, mRightPosition)), 2);
+                addView((mPagerAdapter.instantiateItem(this, mRightPosition)), 2);
                 break;
             case SCROLL_TO_LEFT:
                 mPagerAdapter.destroyItem(this, mRightPosition, getChildAt(2));
                 mRightPosition = oldPosition;
                 mCurrentPosition = mLeftPosition;
                 mLeftPosition = (mLeftPosition + mItemsCount - 1) % mItemsCount;
-                addView(((View) mPagerAdapter.instantiateItem(this, mLeftPosition)), 0);
+                addView((mPagerAdapter.instantiateItem(this, mLeftPosition)), 0);
                 break;
         }
         if (mOnPageChangeListener != null) {
@@ -316,5 +306,33 @@ public class CubePager extends ViewGroup {
 
     public int getItemsCount() {
         return mItemsCount;
+    }
+
+    //  数据变化，界面更新
+    public void onDataSetChanged() {
+        removeAllViews();
+        mItemsCount = mPagerAdapter.getCount();
+        if (mItemsCount == 0) {
+            return;
+        }
+        if (mItemsCount > 2) {
+            mCurrentPosition = 0;
+            mRightPosition = 1;
+            mLeftPosition = mItemsCount - 1;
+            addView(mPagerAdapter.instantiateItem(this, mLeftPosition), 0);
+            addView(mPagerAdapter.instantiateItem(this, mCurrentPosition), 1);
+            addView(mPagerAdapter.instantiateItem(this, mRightPosition), 2);
+        }
+        requestLayout();
+        if (mAutoMove) {
+            startTimer();
+        }
+    }
+
+    private class CubeObserver extends DataSetObserver {
+        @Override
+        public void onChanged() {
+            onDataSetChanged();
+        }
     }
 }
