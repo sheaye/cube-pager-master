@@ -1,6 +1,7 @@
 package com.sheaye.widget;
 
 import android.content.Context;
+import android.database.DataSetObservable;
 import android.database.DataSetObserver;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
@@ -22,6 +23,7 @@ public abstract class CubePagerAdapter<T> {
     private List<T> mData;
     private SparseArray<View> mViews;
     private DataSetObserver mObserver;
+    private DataSetObservable mObservable = new DataSetObservable();
 
     public CubePagerAdapter(Context context) {
         mContext = context;
@@ -82,5 +84,14 @@ public abstract class CubePagerAdapter<T> {
                 mObserver.onChanged();
             }
         }
+        mObservable.notifyChanged();
+    }
+
+    public void registerDataSetObserver(DataSetObserver observer) {
+        mObservable.registerObserver(observer);
+    }
+
+    public void unregisterObserver(DataSetObserver observer) {
+        mObservable.unregisterObserver(observer);
     }
 }

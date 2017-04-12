@@ -21,8 +21,6 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity {
 
     protected CubePager mCubePager;
-    private ArrayList<ImageView> mImageViews;
-    private int[] pics = {R.drawable.pic1, R.drawable.pic2, R.drawable.pic3, R.drawable.pic4};
     private List<Integer> picList = Arrays.asList(R.drawable.pic1, R.drawable.pic2, R.drawable.pic3, R.drawable.pic4);
     protected DotsLayout mDotsLayout;
     protected PicAdapter mPagerAdapter;
@@ -33,20 +31,12 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         mCubePager = ((CubePager) findViewById(R.id.m_cube_pager));
         mDotsLayout = ((DotsLayout) findViewById(R.id.m_dots_layout));
-        mImageViews = new ArrayList<>();
-        /*for (int i = 0; i < pics.length; i++) {
-            ImageView imageView = new ImageView(this);
-            imageView.setScaleType(ImageView.ScaleType.CENTER);
-            imageView.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
-            imageView.setImageResource(pics[i]);
-            mImageViews.add(imageView);
-        }*/
         mCubePager.setAutoMove(true);
         mPagerAdapter = new PicAdapter(this);
         mCubePager.setAdapter(mPagerAdapter);
+        mDotsLayout.setUpWithCubePager(mCubePager);
         mPagerAdapter.addAll(picList);
 
-//        mDotsLayout.setUpWithCubePager(mCubePager);
     }
 
     class PicAdapter extends CubePagerAdapter<Integer> {

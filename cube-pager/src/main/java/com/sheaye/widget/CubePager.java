@@ -1,15 +1,14 @@
 package com.sheaye.widget;
 
 import android.content.Context;
+import android.database.DataSetObservable;
 import android.database.DataSetObserver;
 import android.graphics.Camera;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.os.Handler;
 import android.os.Message;
-import android.support.v4.view.PagerAdapter;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewConfiguration;
@@ -329,10 +328,15 @@ public class CubePager extends ViewGroup {
         }
     }
 
+    public CubePagerAdapter getPagerAdapter() {
+        return mPagerAdapter;
+    }
+
     private class CubeObserver extends DataSetObserver {
         @Override
         public void onChanged() {
             onDataSetChanged();
         }
     }
+
 }
