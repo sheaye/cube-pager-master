@@ -3,6 +3,7 @@ package com.sheaye.widget;
 import android.content.Context;
 import android.database.DataSetObservable;
 import android.database.DataSetObserver;
+import android.util.Log;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -53,18 +54,16 @@ public abstract class CubePagerAdapter<T> {
     }
 
     final View instantiateItem(ViewGroup container, int position) {
-        View view = mViews.get(position);
-        if (view == null) {
-            view = getView(getLayoutInflater(), container, position, mData.get(position));
-            mViews.append(position, view);
-        }
+        View view = getView(getLayoutInflater(), container, position, mData.get(position));
+        mViews.append(position, view);
         return view;
     }
 
-    final void destroyItem(ViewGroup container, int position, Object object) {
+    final void destroyItem(ViewGroup container, int position) {
         View view = mViews.get(position);
         if (view != null) {
             container.removeView(view);
+            mViews.delete(position);
         }
     }
 

@@ -1,7 +1,6 @@
 package com.sheaye.widget;
 
 import android.content.Context;
-import android.database.DataSetObservable;
 import android.database.DataSetObserver;
 import android.graphics.Camera;
 import android.graphics.Canvas;
@@ -184,14 +183,14 @@ public class CubePager extends ViewGroup {
         int oldPosition = mCurrentPosition;
         switch (scrollDirect) {
             case SCROLL_TO_RIGHT:
-                mPagerAdapter.destroyItem(this, mLeftPosition, getChildAt(0));
+                mPagerAdapter.destroyItem(this, mLeftPosition);
                 mLeftPosition = oldPosition;
                 mCurrentPosition = mRightPosition;
                 mRightPosition = (mRightPosition + 1) % mItemsCount;
                 addView((mPagerAdapter.instantiateItem(this, mRightPosition)), 2);
                 break;
             case SCROLL_TO_LEFT:
-                mPagerAdapter.destroyItem(this, mRightPosition, getChildAt(2));
+                mPagerAdapter.destroyItem(this, mRightPosition);
                 mRightPosition = oldPosition;
                 mCurrentPosition = mLeftPosition;
                 mLeftPosition = (mLeftPosition + mItemsCount - 1) % mItemsCount;
@@ -279,9 +278,11 @@ public class CubePager extends ViewGroup {
 
     private void moveToNextPage() {
 //      仿照onTouchEvent完成前半部分的动作
-        mScroller.startScroll(0, 0, -mScrollDirect * mWidth / 2, 0);
-        invalidate();
-        updateLayout(mScrollDirect);
+        if (mItemsCount > 0) {
+            mScroller.startScroll(0, 0, -mScrollDirect * mWidth / 2, 0);
+            invalidate();
+            updateLayout(mScrollDirect);
+        }
     }
 
     @Override

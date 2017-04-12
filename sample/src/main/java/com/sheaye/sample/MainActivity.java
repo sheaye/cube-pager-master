@@ -1,6 +1,7 @@
 package com.sheaye.sample;
 
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.support.v4.view.PagerAdapter;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -21,7 +22,6 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity {
 
     protected CubePager mCubePager;
-    private List<Integer> picList = Arrays.asList(R.drawable.pic1, R.drawable.pic2, R.drawable.pic3, R.drawable.pic4);
     protected DotsLayout mDotsLayout;
     protected PicAdapter mPagerAdapter;
 
@@ -35,6 +35,13 @@ public class MainActivity extends AppCompatActivity {
         mPagerAdapter = new PicAdapter(this);
         mCubePager.setAdapter(mPagerAdapter);
         mDotsLayout.setUpWithCubePager(mCubePager);
+
+        List<Integer> picList = new ArrayList<>();
+        TypedArray typedArray = getResources().obtainTypedArray(R.array.pictures);
+        for (int i = 0; i < typedArray.length(); i++) {
+            picList.add(typedArray.getResourceId(i,0));
+        }
+        typedArray.recycle();
         mPagerAdapter.addAll(picList);
     }
 
