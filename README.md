@@ -1,4 +1,7 @@
 # cube-pager-master
+![演示图](/screenshots/demo.gif)
+
+
 呈现3D翻转效果的仿ViewPager
 该控件直接继承自ViewGroup,具有以下特点：
 1. 可以无限向左或向右翻滚，该控件始终包含左中右三个子View，向左和向右滑包括回收View和新生View两个动作；
