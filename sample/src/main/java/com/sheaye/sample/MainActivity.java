@@ -36,7 +36,6 @@ public class MainActivity extends AppCompatActivity {
         mCubePager.setAdapter(mPagerAdapter);
         mDotsLayout.setUpWithCubePager(mCubePager);
         mPagerAdapter.addAll(picList);
-
     }
 
     class PicAdapter extends CubePagerAdapter<Integer> {

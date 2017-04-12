@@ -1,1 +1,1 @@
-include ':app', ':cube-pager'
+include ':sample', ':cube-pager'
