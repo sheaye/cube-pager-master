@@ -2,10 +2,9 @@ package com.sheaye.sample;
 
 import android.content.Context;
 import android.content.res.TypedArray;
-import android.support.v4.view.PagerAdapter;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.view.LayoutInflater;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -16,7 +15,6 @@ import com.sheaye.widget.CubePagerAdapter;
 import com.sheaye.widget.DotsLayout;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
@@ -39,7 +37,7 @@ public class MainActivity extends AppCompatActivity {
         List<Integer> picList = new ArrayList<>();
         TypedArray typedArray = getResources().obtainTypedArray(R.array.pictures);
         for (int i = 0; i < typedArray.length(); i++) {
-            picList.add(typedArray.getResourceId(i,0));
+            picList.add(typedArray.getResourceId(i, 0));
         }
         typedArray.recycle();
         mPagerAdapter.addAll(picList);
@@ -52,8 +50,13 @@ public class MainActivity extends AppCompatActivity {
         }
 
         @Override
-        public View getView(LayoutInflater layoutInflater, ViewGroup container, int position, Integer item) {
-            ImageView imageView = new ImageView(mContext);
+        public View getItemView(int position, ViewGroup parent, View convertView, Integer item) {
+            ImageView imageView;
+            if (convertView != null) {
+                imageView = (ImageView) convertView;
+            }else {
+                imageView = new ImageView(mContext);
+            }
             imageView.setScaleType(ImageView.ScaleType.CENTER);
             imageView.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
             imageView.setImageResource(item);
