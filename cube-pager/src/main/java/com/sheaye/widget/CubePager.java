@@ -8,7 +8,6 @@ import android.graphics.Matrix;
 import android.os.Handler;
 import android.os.Message;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewConfiguration;
@@ -58,7 +57,10 @@ public class CubePager extends ViewGroup {
         }
     };
     private Timer mTimer;
-    private long mDuration = 5000;
+//  定时翻转的间隔时间
+    private long mInterval = 5000;
+//  翻转的持续时间
+    private int mDuration = 2000;
 
     private boolean mAutoMove;
     private static final int LEFT = 0;
@@ -271,7 +273,7 @@ public class CubePager extends ViewGroup {
             public void run() {
                 mHandler.sendEmptyMessage(0);
             }
-        }, mDuration, mDuration);
+        }, mInterval, mInterval);
     }
 
     public void stopTimer() {
@@ -281,14 +283,18 @@ public class CubePager extends ViewGroup {
         mTimer = null;
     }
 
-    public void setDuration(long duration) {
-        mDuration = duration;
+    public void setInterval(long interval) {
+        mInterval = interval;
+    }
+
+    public void setDuration(int duration) {
+        this.mDuration = duration;
     }
 
     private void moveToNextPage() {
 //      仿照onTouchEvent完成前半部分的动作
         if (mItemsCount > 0) {
-            mScroller.startScroll(0, 0, -mScrollDirect * mWidth / 2, 0);
+            mScroller.startScroll(0, 0, -mScrollDirect * mWidth / 2, 0, mDuration/2);
             invalidate();
             updateLayout(mScrollDirect);
         }

@@ -18,6 +18,7 @@ public class DotsLayout extends LinearLayout implements CubePager.OnPageChangeLi
     protected int mDotRadius;
     private DotsObserver mObserver;
     protected CubePager mCubePager;
+    protected int mDotSelector;
 
     public DotsLayout(Context context) {
         this(context, null);
@@ -33,6 +34,7 @@ public class DotsLayout extends LinearLayout implements CubePager.OnPageChangeLi
         setGravity(Gravity.CENTER);
         TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.DotsLayout);
         mDotRadius = typedArray.getInteger(R.styleable.DotsLayout_radius, 10);
+        mDotSelector = typedArray.getResourceId(R.styleable.DotsLayout_dot_selector, R.drawable.selector_dot);
         typedArray.recycle();
     }
 
@@ -67,7 +69,7 @@ public class DotsLayout extends LinearLayout implements CubePager.OnPageChangeLi
         removeAllViews();
         for (int i = 0; i < mCubePager.getItemsCount(); i++) {
             ImageView imageView = new ImageView(mContext);
-            imageView.setImageResource(R.drawable.selector_dot);
+            imageView.setImageResource(mDotSelector);
             imageView.setLayoutParams(new LayoutParams(4 * mDotRadius, 4 * mDotRadius));
             imageView.setPadding(10, 10, 10, 10);
             addView(imageView);

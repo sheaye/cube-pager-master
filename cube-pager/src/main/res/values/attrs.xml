@@ -2,5 +2,6 @@
 <resources>
     <declare-styleable name="DotsLayout">
         <attr name="radius" format="integer" />
+        <attr name="dot_selector" format="reference" />
     </declare-styleable>
 </resources>
