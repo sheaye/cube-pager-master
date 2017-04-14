@@ -204,7 +204,7 @@ public class CubePager extends ViewGroup {
 //      mScrollDirect 左滑1,右滑-1,其他0
         int startX = getScrollX() + this.mScrollDirect * mWidth;
 //      此时可视页面的实际位置已经发生变化（从3-->2或者从1-->2）,需要回到0位置，这里伪造一个持续滚动的假象
-        int duration = ((int) (1000 * Math.abs(startX * 2f / mWidth)));
+        int duration = ((int) (mDuration * Math.abs(startX * 1.f / mWidth)));
         mScroller.startScroll(startX, 0, -startX, 0, duration);
 //        Log.e(TAG, "startX = " + startX + ", duration = " + duration);
         invalidate();
