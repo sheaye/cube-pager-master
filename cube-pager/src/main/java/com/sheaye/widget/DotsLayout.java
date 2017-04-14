@@ -55,11 +55,11 @@ public class DotsLayout extends LinearLayout implements CubePager.OnPageChangeLi
 
     @Override
     public void onPageChanged(int currentPosition, int oldPosition) {
-        if (getChildCount() > currentPosition) {
-            getChildAt(currentPosition).setSelected(true);
-        }
         if (getChildCount() > oldPosition) {
             getChildAt(oldPosition).setSelected(false);
+        }
+        if (getChildCount() > currentPosition) {
+            getChildAt(currentPosition).setSelected(true);
         }
     }
 

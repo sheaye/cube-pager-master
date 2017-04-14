@@ -8,6 +8,7 @@ import android.graphics.Matrix;
 import android.os.Handler;
 import android.os.Message;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewConfiguration;
@@ -44,9 +45,6 @@ public class CubePager extends ViewGroup {
     private float mMoveX;
     private int mWidth;
     private int mHeight;
-    private int mLeftPosition;
-    private int mRightPosition;
-    private int mCurrentPosition;
     private Camera mCamera;
     private static float MAX_ROTATE = 50;
     private Matrix mMatrix;
@@ -61,7 +59,13 @@ public class CubePager extends ViewGroup {
     };
     private Timer mTimer;
     private long mDuration = 5000;
+
     private boolean mAutoMove;
+    private static final int LEFT = 0;
+    private static final int CURRENT = 1;
+    private static final int RIGHT = 2;
+
+    private int[] mPositions;
 
     public CubePager(Context context) {
         this(context, null);
@@ -69,10 +73,10 @@ public class CubePager extends ViewGroup {
 
     public CubePager(Context context, AttributeSet attrs) {
         super(context, attrs);
-        initSolidPager(context, attrs);
+        initCubePager(context, attrs);
     }
 
-    private void initSolidPager(Context context, AttributeSet attrs) {
+    private void initCubePager(Context context, AttributeSet attrs) {
         mScroller = new Scroller(context, mInterpolator);
         mMatrix = new Matrix();
         mCamera = new Camera();
@@ -138,6 +142,17 @@ public class CubePager extends ViewGroup {
         return super.onInterceptTouchEvent(ev);
     }
 
+    private void movePositions(int direct) {
+        for (int i = 0; i < mPositions.length; i++) {
+            mPositions[i] += -direct;
+            if (mPositions[i] < 0) {
+                mPositions[i] += mItemsCount;
+            } else if (mPositions[i] >= mItemsCount) {
+                mPositions[i] = 0;
+            }
+        }
+    }
+
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         float curX = event.getRawX();
@@ -168,6 +183,33 @@ public class CubePager extends ViewGroup {
         return true;
     }
 
+    private void updateLayout(int scrollDirect) {
+        int oldPosition = mPositions[CURRENT];
+        switch (scrollDirect) {
+            case SCROLL_TO_RIGHT:
+                mPagerAdapter.destroyItem(this, mPositions[LEFT], LEFT);
+                movePositions(SCROLL_TO_RIGHT);
+                addView(mPagerAdapter.instantiateItem(this, mPositions[RIGHT]), RIGHT);
+                break;
+            case SCROLL_TO_LEFT:
+                mPagerAdapter.destroyItem(this, mPositions[RIGHT], RIGHT);
+                movePositions(SCROLL_TO_LEFT);
+                addView((mPagerAdapter.instantiateItem(this, mPositions[LEFT])), LEFT);
+                break;
+        }
+
+        if (mOnPageChangeListener != null) {
+            mOnPageChangeListener.onPageChanged(mPositions[CURRENT], oldPosition);
+        }
+//      mScrollDirect 左滑1,右滑-1,其他0
+        int startX = getScrollX() + this.mScrollDirect * mWidth;
+//      此时可视页面的实际位置已经发生变化（从3-->2或者从1-->2）,需要回到0位置，这里伪造一个持续滚动的假象
+        int duration = ((int) (1000 * Math.abs(startX * 2f / mWidth)));
+        mScroller.startScroll(startX, 0, -startX, 0, duration);
+//        Log.e(TAG, "startX = " + startX + ", duration = " + duration);
+        invalidate();
+    }
+
     //  必要时父布局用来请求子布局更新其mScrollX和mScrollY，通常在子布局使用scroller实现动画时实现
     @Override
     public void computeScroll() {
@@ -177,36 +219,6 @@ public class CubePager extends ViewGroup {
 //          记得刷新View，否则可能出现滑动中止的异常
             invalidate();
         }
-    }
-
-    private void updateLayout(int scrollDirect) {
-        int oldPosition = mCurrentPosition;
-        switch (scrollDirect) {
-            case SCROLL_TO_RIGHT:
-                mPagerAdapter.destroyItem(this, mLeftPosition);
-                mLeftPosition = oldPosition;
-                mCurrentPosition = mRightPosition;
-                mRightPosition = (mRightPosition + 1) % mItemsCount;
-                addView((mPagerAdapter.instantiateItem(this, mRightPosition)), 2);
-                break;
-            case SCROLL_TO_LEFT:
-                mPagerAdapter.destroyItem(this, mRightPosition);
-                mRightPosition = oldPosition;
-                mCurrentPosition = mLeftPosition;
-                mLeftPosition = (mLeftPosition + mItemsCount - 1) % mItemsCount;
-                addView((mPagerAdapter.instantiateItem(this, mLeftPosition)), 0);
-                break;
-        }
-        if (mOnPageChangeListener != null) {
-            mOnPageChangeListener.onPageChanged(mCurrentPosition, oldPosition);
-        }
-//      mScrollDirect 左滑1,右滑-1,其他0
-        int startX = getScrollX() + this.mScrollDirect * mWidth;
-//      此时可视页面的实际位置已经发生变化（从3-->2或者从1-->2）,需要回到0位置，这里伪造一个持续滚动的假象
-        int duration = ((int) (1000 * Math.abs(startX * 2f / mWidth)));
-        mScroller.startScroll(startX, 0, -startX, 0, duration);
-//        Log.e(TAG, "startX = " + startX + ", duration = " + duration);
-        invalidate();
     }
 
     @Override
@@ -247,9 +259,6 @@ public class CubePager extends ViewGroup {
     public void setAutoMove(boolean autoMove) {
         mAutoMove = autoMove;
         mScrollDirect = SCROLL_TO_RIGHT;
-        if (mAutoMove) {
-            startTimer();
-        }
     }
 
     public void startTimer() {
@@ -315,17 +324,21 @@ public class CubePager extends ViewGroup {
         if (mItemsCount == 0) {
             return;
         }
-        if (mItemsCount > 2) {
-            mCurrentPosition = 0;
-            mRightPosition = 1;
-            mLeftPosition = mItemsCount - 1;
-            addView(mPagerAdapter.instantiateItem(this, mLeftPosition), 0);
-            addView(mPagerAdapter.instantiateItem(this, mCurrentPosition), 1);
-            addView(mPagerAdapter.instantiateItem(this, mRightPosition), 2);
+        initPositions();
+        for (int i = 0; i < mPositions.length; i++) {
+            addView(mPagerAdapter.instantiateItem(this, mPositions[i]), i);
         }
         requestLayout();
         if (mAutoMove) {
             startTimer();
+        }
+    }
+
+    private void initPositions() {
+        if (mItemsCount < 2) {
+            mPositions = new int[]{0, 0, 0};
+        } else {
+            mPositions = new int[]{mItemsCount - 1, 0, 1};
         }
     }
 

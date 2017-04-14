@@ -3,6 +3,7 @@ package com.sheaye.widget;
 import android.content.Context;
 import android.database.DataSetObservable;
 import android.database.DataSetObserver;
+import android.util.Log;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,7 +22,7 @@ public abstract class CubePagerAdapter<T> {
 
     protected Context mContext;
     private List<T> mData;
-    private SparseArray<View> mViews;
+//    private SparseArray<View> mViews;
     private DataSetObserver mObserver;
     private DataSetObservable mObservable = new DataSetObservable();
     private View mConvertView;
@@ -29,7 +30,7 @@ public abstract class CubePagerAdapter<T> {
     public CubePagerAdapter(Context context) {
         mContext = context;
         mData = new ArrayList<>();
-        mViews = new SparseArray<>();
+//        mViews = new SparseArray<>();
     }
 
     public void addAll(Collection<? extends T> collection) {
@@ -55,15 +56,15 @@ public abstract class CubePagerAdapter<T> {
 
     final View instantiateItem(ViewGroup parent, int position) {
         View view = getItemView(position, parent, mConvertView, mData.get(position));
-        mViews.append(position, view);
+//        mViews.append(position, view);
         return view;
     }
 
-    final void destroyItem(ViewGroup container, int position) {
-        mConvertView = mViews.get(position);
+    final void destroyItem(ViewGroup parent, int position, int index) {
+        mConvertView = parent.getChildAt(index);
         if (mConvertView != null) {
-            container.removeView(mConvertView);
-            mViews.delete(position);
+            parent.removeView(mConvertView);
+//            mViews.delete(position);
         }
     }
 
@@ -92,5 +93,9 @@ public abstract class CubePagerAdapter<T> {
 
     public void unregisterObserver(DataSetObserver observer) {
         mObservable.unregisterObserver(observer);
+    }
+
+    public List<T> getData() {
+        return mData;
     }
 }

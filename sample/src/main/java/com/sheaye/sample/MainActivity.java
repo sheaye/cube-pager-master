@@ -56,9 +56,9 @@ public class MainActivity extends AppCompatActivity {
                 imageView = (ImageView) convertView;
             }else {
                 imageView = new ImageView(mContext);
+                imageView.setScaleType(ImageView.ScaleType.CENTER);
+                imageView.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
             }
-            imageView.setScaleType(ImageView.ScaleType.CENTER);
-            imageView.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
             imageView.setImageResource(item);
             return imageView;
         }
