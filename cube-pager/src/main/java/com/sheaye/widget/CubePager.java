@@ -154,17 +154,6 @@ public class CubePager extends ViewGroup {
         }
     }
 
-    private void movePositions(int direct) {
-        for (int i = 0; i < mPositions.length; i++) {
-            mPositions[i] += -direct;
-            if (mPositions[i] < 0) {
-                mPositions[i] += mItemsCount;
-            } else if (mPositions[i] >= mItemsCount) {
-                mPositions[i] = 0;
-            }
-        }
-    }
-
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         int scrollDirect;
@@ -197,22 +186,12 @@ public class CubePager extends ViewGroup {
     }
 
     private void updateLayout(int scrollDirect) {
-        int oldPosition = mPositions[CURRENT];
-        switch (scrollDirect) {
-            case SCROLL_TO_RIGHT:
-                mPagerAdapter.destroyItem(this, mPositions[LEFT], LEFT);
-                movePositions(SCROLL_TO_RIGHT);
-                addView(mPagerAdapter.instantiateItem(this, mPositions[RIGHT]), RIGHT);
-                break;
-            case SCROLL_TO_LEFT:
-                mPagerAdapter.destroyItem(this, mPositions[RIGHT], RIGHT);
-                movePositions(SCROLL_TO_LEFT);
-                addView((mPagerAdapter.instantiateItem(this, mPositions[LEFT])), LEFT);
-                break;
-        }
-
-        if (mOnPageChangeListener != null && scrollDirect != 0) {
-            mOnPageChangeListener.onPageChanged(mPositions[CURRENT], oldPosition);
+        if (scrollDirect!=0) {
+            int oldPosition = mPositions[CURRENT];
+            adjustViews(scrollDirect);
+            if (mOnPageChangeListener != null) {
+                mOnPageChangeListener.onPageChanged(mPositions[CURRENT], oldPosition);
+            }
         }
 //      mScrollDirect 左滑1,右滑-1,其他0
         int startX = getScrollX() + scrollDirect * mWidth;
@@ -223,7 +202,32 @@ public class CubePager extends ViewGroup {
         invalidate();
     }
 
-    //  必要时父布局用来请求子布局更新其mScrollX和mScrollY，通常在子布局使用scroller实现动画时实现
+    private void adjustViews(int scrollDirect) {
+        int destroyIndex, addIndex;
+        if (scrollDirect == SCROLL_TO_RIGHT) {
+            destroyIndex = LEFT;
+            addIndex = RIGHT;
+        } else {
+            destroyIndex = RIGHT;
+            addIndex = LEFT;
+        }
+        mPagerAdapter.destroyItem(this, mPositions[destroyIndex], destroyIndex);
+        movePositions(scrollDirect);
+        addView(mPagerAdapter.instantiateItem(this, mPositions[addIndex]), addIndex);
+    }
+
+    private void movePositions(int direct) {
+        for (int i = 0; i < mPositions.length; i++) {
+            mPositions[i] += -direct;
+            if (mPositions[i] < 0) {
+                mPositions[i] += mItemsCount;
+            } else if (mPositions[i] >= mItemsCount) {
+                mPositions[i] = 0;
+            }
+        }
+    }
+
+//  必要时父布局用来请求子布局更新其mScrollX和mScrollY，通常在子布局使用scroller实现动画时实现
     @Override
     public void computeScroll() {
 //      获取新位置时调用此方法，返回true表示滑动还没有结束
