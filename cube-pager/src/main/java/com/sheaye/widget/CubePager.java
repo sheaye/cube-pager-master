@@ -45,7 +45,7 @@ public class CubePager extends ViewGroup {
     private int mWidth;
     private int mHeight;
     private Camera mCamera;
-    private static float MAX_ROTATE = 50;
+    private float mMaxRotate = 50;
     private Matrix mMatrix;
     private CubeObserver mObserver;
 
@@ -238,9 +238,9 @@ public class CubePager extends ViewGroup {
             if (right <= 0 || left >= mWidth) {
                 continue;
             }
-//          页面左滑由1翻转到2时，页面1的旋转角度由0到-MAX_ROTATE，页面2的旋转角度由MAX_ROTATE到0
-//          页面右滑由1翻转到0时，页面0的旋转角度由-MAX_ROTATE到0，页面1的旋转角度由0到+MAX_ROTATE
-            float rotate = (i - 1 - interpolation) * MAX_ROTATE;
+//          页面左滑由1翻转到2时，页面1的旋转角度由0到-mMaxRotate，页面2的旋转角度由MAX_ROTATE到0
+//          页面右滑由1翻转到0时，页面0的旋转角度由-MAX_ROTATE到0，页面1的旋转角度由0到+mMaxRotate
+            float rotate = (i - 1 - interpolation) * mMaxRotate;
 //            Log.e(TAG, "position = " + i + ", left = " + left + ", right = " + right + ", rotate = " + rotate + ", scrollX = " + scrollX);
 
             mCamera.save();
@@ -359,4 +359,7 @@ public class CubePager extends ViewGroup {
         }
     }
 
+    public void setMaxRotate(float maxRotate) {
+        this.mMaxRotate = maxRotate;
+    }
 }
