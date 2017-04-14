@@ -8,10 +8,12 @@ import android.graphics.Matrix;
 import android.os.Handler;
 import android.os.Message;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewConfiguration;
 import android.view.ViewGroup;
+import android.view.ViewParent;
 import android.view.animation.Interpolator;
 import android.widget.Scroller;
 
@@ -27,7 +29,6 @@ public class CubePager extends ViewGroup {
     private static final String TAG = "CubePager";
     private static final int SCROLL_TO_LEFT = 1;
     private static final int SCROLL_TO_RIGHT = -1;
-    private int mScrollDirect;
     private CubePagerAdapter mPagerAdapter;
     private int mItemsCount;
     private Interpolator mInterpolator = new Interpolator() {
@@ -53,13 +54,13 @@ public class CubePager extends ViewGroup {
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
-            moveToNextPage();
+            scheduleToNextPage(SCROLL_TO_RIGHT);
         }
     };
     private Timer mTimer;
-//  定时翻转的间隔时间
+    //  定时翻转的间隔时间
     private long mInterval = 5000;
-//  翻转的持续时间
+    //  翻转的持续时间
     private int mDuration = 2000;
 
     private boolean mAutoMove;
@@ -83,6 +84,7 @@ public class CubePager extends ViewGroup {
         mMatrix = new Matrix();
         mCamera = new Camera();
         mTouchSlop = ViewConfiguration.get(context).getScaledDoubleTapSlop();
+        Log.e(TAG, "mTouchSlop = " + mTouchSlop);
     }
 
     //  onMeasure决定View本身和它的内容的尺寸
@@ -137,11 +139,19 @@ public class CubePager extends ViewGroup {
                 float delta = Math.abs(mMoveX - mDownX);
                 mLastMoveX = mMoveX;
                 if (delta > mTouchSlop) {
+                    requestParentDisallowIntercept(true);
                     return true;
                 }
                 break;
         }
         return super.onInterceptTouchEvent(ev);
+    }
+
+    public void requestParentDisallowIntercept(boolean disallowIntercept) {
+        ViewParent parent = getParent();
+        if (parent != null) {
+            parent.requestDisallowInterceptTouchEvent(disallowIntercept);
+        }
     }
 
     private void movePositions(int direct) {
@@ -157,6 +167,7 @@ public class CubePager extends ViewGroup {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
+        int scrollDirect;
         float curX = event.getRawX();
         switch (event.getAction()) {
             case MotionEvent.ACTION_MOVE:
@@ -169,14 +180,14 @@ public class CubePager extends ViewGroup {
                 int dist = ((int) (curX - mDownX));
                 if (Math.abs(dist) > mWidth / 2) {
                     if (dist < 0) {// 滑到右边一页
-                        mScrollDirect = SCROLL_TO_RIGHT;
+                        scrollDirect = SCROLL_TO_RIGHT;
                     } else {
-                        mScrollDirect = SCROLL_TO_LEFT;
+                        scrollDirect = SCROLL_TO_LEFT;
                     }
                 } else {
-                    mScrollDirect = 0;
+                    scrollDirect = 0;
                 }
-                updateLayout(mScrollDirect);
+                updateLayout(scrollDirect);
                 if (mAutoMove) {
                     startTimer();
                 }
@@ -200,11 +211,11 @@ public class CubePager extends ViewGroup {
                 break;
         }
 
-        if (mOnPageChangeListener != null) {
+        if (mOnPageChangeListener != null && scrollDirect != 0) {
             mOnPageChangeListener.onPageChanged(mPositions[CURRENT], oldPosition);
         }
 //      mScrollDirect 左滑1,右滑-1,其他0
-        int startX = getScrollX() + this.mScrollDirect * mWidth;
+        int startX = getScrollX() + scrollDirect * mWidth;
 //      此时可视页面的实际位置已经发生变化（从3-->2或者从1-->2）,需要回到0位置，这里伪造一个持续滚动的假象
         int duration = ((int) (mDuration * Math.abs(startX * 1.f / mWidth)));
         mScroller.startScroll(startX, 0, -startX, 0, duration);
@@ -260,7 +271,6 @@ public class CubePager extends ViewGroup {
 
     public void setAutoMove(boolean autoMove) {
         mAutoMove = autoMove;
-        mScrollDirect = SCROLL_TO_RIGHT;
     }
 
     public void startTimer() {
@@ -291,12 +301,12 @@ public class CubePager extends ViewGroup {
         this.mDuration = duration;
     }
 
-    private void moveToNextPage() {
+    private void scheduleToNextPage(int scrollDirect) {
 //      仿照onTouchEvent完成前半部分的动作
         if (mItemsCount > 0) {
-            mScroller.startScroll(0, 0, -mScrollDirect * mWidth / 2, 0, mDuration/2);
+            mScroller.startScroll(0, 0, -scrollDirect * mWidth / 2, 0, mDuration / 2);
             invalidate();
-            updateLayout(mScrollDirect);
+            updateLayout(scrollDirect);
         }
     }
 
