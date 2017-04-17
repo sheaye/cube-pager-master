@@ -12,14 +12,16 @@
 7. 集成小圆点容器控件，关联CubePager即可。
 
 ## 使用
-1. 在布局文件中定义CubePager:
+1. 暂时没有将library放到Jcenter上，同志们可以直接import module或者引用cube-pager/build/outputs/aar下面的的aar文件
+
+2. 在布局文件中定义CubePager:
 ```
 <com.sheaye.widget.CubePager
     android:id="@+id/m_cube_pager"
     android:layout_width="match_parent"
     android:layout_height="250dp"/>
 ```
-2. 继承CubePagerAdapter<T>，T为bean的类型，声明构造方法，重写getItemView方法，例如：
+3. 继承CubePagerAdapter<T>，T为bean的类型，声明构造方法，重写getItemView方法，例如：
 ```
 class PicAdapter extends CubePagerAdapter<Integer> {
 
@@ -43,7 +45,7 @@ class PicAdapter extends CubePagerAdapter<Integer> {
         }
 }
 ```
-3. 设置CubePager的特性，设置适配器：
+4. 设置CubePager的特性，设置适配器：
 ```
 mPagerAdapter = new PicAdapter(this, mPicList);
         mCubePager
@@ -55,7 +57,7 @@ mPagerAdapter = new PicAdapter(this, mPicList);
 
         mDotsLayout.setUpWithCubePager(mCubePager);
 ```
-4. 设置DotsLayout,添加小圆点容器
+5. 设置DotsLayout,添加小圆点容器
 
 xml布局：dot_selector可以为小圆点设置selector
 ```
@@ -67,11 +69,11 @@ xml布局：dot_selector可以为小圆点设置selector
     android:layout_gravity="bottom"
     app:dot_selector="@drawable/selector_dot"/>
 ```
-关联CubePager：需要在CubePager设置Adapter之后关联，使用了CubePager的OnPageChangeListener
+关联CubePager：需要在CubePager设置Adapter之后关联
 ```
 mDotsLayout.setUpWithCubePager(mCubePager);
 ```
-5. 更多使用详情，请参照sample
+6. 更多使用详情，请参照sample
 
 ## 参考链接：
 
