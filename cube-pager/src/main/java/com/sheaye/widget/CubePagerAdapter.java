@@ -3,6 +3,7 @@ package com.sheaye.widget;
 import android.content.Context;
 import android.database.DataSetObservable;
 import android.database.DataSetObserver;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,6 +30,11 @@ public abstract class CubePagerAdapter<T> {
         mData = new ArrayList<>();
     }
 
+    public CubePagerAdapter(Context mContext, List<T> mData) {
+        this.mContext = mContext;
+        this.mData = mData;
+    }
+
     public void addAll(Collection<? extends T> collection) {
         mData.addAll(collection);
         notifyDataSetChanged();
@@ -36,6 +42,11 @@ public abstract class CubePagerAdapter<T> {
 
     public void addAll(T[] t) {
         Collections.addAll(mData, t);
+        notifyDataSetChanged();
+    }
+
+    public void clear() {
+        mData.clear();
         notifyDataSetChanged();
     }
 
@@ -72,7 +83,8 @@ public abstract class CubePagerAdapter<T> {
         mObserver = dataSetObserver;
     }
 
-    private void notifyDataSetChanged() {
+    public void notifyDataSetChanged() {
+        mConvertView = null;
         synchronized (this) {
             if (mObserver != null) {
                 mObserver.onChanged();

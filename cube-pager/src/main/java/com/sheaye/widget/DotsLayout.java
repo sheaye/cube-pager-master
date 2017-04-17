@@ -39,7 +39,7 @@ public class DotsLayout extends LinearLayout implements CubePager.OnPageChangeLi
     }
 
     /**
-     * 请在CubePager.setAdapter之后使用此方法
+     * 因为这里直接使用adapter作为Observable,请在CubePager.setAdapter之后使用此方法
      *
      * @param cubePager
      */

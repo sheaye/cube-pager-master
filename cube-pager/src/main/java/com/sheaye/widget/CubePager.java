@@ -84,7 +84,6 @@ public class CubePager extends ViewGroup {
         mMatrix = new Matrix();
         mCamera = new Camera();
         mTouchSlop = ViewConfiguration.get(context).getScaledDoubleTapSlop();
-        Log.e(TAG, "mTouchSlop = " + mTouchSlop);
     }
 
     //  onMeasure决定View本身和它的内容的尺寸
@@ -186,7 +185,7 @@ public class CubePager extends ViewGroup {
     }
 
     private void updateLayout(int scrollDirect) {
-        if (scrollDirect!=0) {
+        if (scrollDirect != 0) {
             int oldPosition = mPositions[CURRENT];
             adjustViews(scrollDirect);
             if (mOnPageChangeListener != null) {
@@ -203,17 +202,31 @@ public class CubePager extends ViewGroup {
     }
 
     private void adjustViews(int scrollDirect) {
-        int destroyIndex, addIndex;
+        int destroyIndex, insertIndex;
         if (scrollDirect == SCROLL_TO_RIGHT) {
             destroyIndex = LEFT;
-            addIndex = RIGHT;
+            insertIndex = RIGHT;
         } else {
             destroyIndex = RIGHT;
-            addIndex = LEFT;
+            insertIndex = LEFT;
         }
         mPagerAdapter.destroyItem(this, mPositions[destroyIndex], destroyIndex);
         movePositions(scrollDirect);
-        addView(mPagerAdapter.instantiateItem(this, mPositions[addIndex]), addIndex);
+        insertView(insertIndex);
+    }
+
+    private void insertView(int index) {
+        View child = mPagerAdapter.instantiateItem(this, mPositions[index]);
+        if (child != null) {
+            ViewParent parent = child.getParent();
+            if (parent != null) {
+                ((ViewGroup) parent).removeView(child);
+            }
+            Log.e(TAG, "addView(" + index + "/" + getChildCount() + ")");
+            if (index <= getChildCount()) {
+                addView(child, index);
+            }
+        }
     }
 
     private void movePositions(int direct) {
@@ -227,7 +240,7 @@ public class CubePager extends ViewGroup {
         }
     }
 
-//  必要时父布局用来请求子布局更新其mScrollX和mScrollY，通常在子布局使用scroller实现动画时实现
+    //  必要时父布局用来请求子布局更新其mScrollX和mScrollY，通常在子布局使用scroller实现动画时实现
     @Override
     public void computeScroll() {
 //      获取新位置时调用此方法，返回true表示滑动还没有结束
@@ -273,10 +286,6 @@ public class CubePager extends ViewGroup {
         }
     }
 
-    public void setAutoMove(boolean autoMove) {
-        mAutoMove = autoMove;
-    }
-
     public void startTimer() {
         if (mTimer != null) {
             mTimer.cancel();
@@ -297,17 +306,9 @@ public class CubePager extends ViewGroup {
         mTimer = null;
     }
 
-    public void setInterval(long interval) {
-        mInterval = interval;
-    }
-
-    public void setDuration(int duration) {
-        this.mDuration = duration;
-    }
-
     private void scheduleToNextPage(int scrollDirect) {
 //      仿照onTouchEvent完成前半部分的动作
-        if (mItemsCount > 0) {
+        if (getChildCount() > 0) {
             mScroller.startScroll(0, 0, -scrollDirect * mWidth / 2, 0, mDuration / 2);
             invalidate();
             updateLayout(scrollDirect);
@@ -339,6 +340,7 @@ public class CubePager extends ViewGroup {
 
     //  数据变化，界面更新
     public void onDataSetChanged() {
+        stopTimer();
         removeAllViews();
         mItemsCount = mPagerAdapter.getCount();
         if (mItemsCount == 0) {
@@ -346,9 +348,8 @@ public class CubePager extends ViewGroup {
         }
         initPositions();
         for (int i = 0; i < mPositions.length; i++) {
-            addView(mPagerAdapter.instantiateItem(this, mPositions[i]), i);
+            insertView(i);
         }
-        requestLayout();
         if (mAutoMove) {
             startTimer();
         }
@@ -373,7 +374,23 @@ public class CubePager extends ViewGroup {
         }
     }
 
-    public void setMaxRotate(float maxRotate) {
+    public CubePager setMaxRotate(float maxRotate) {
         this.mMaxRotate = maxRotate;
+        return this;
+    }
+
+    public CubePager setInterval(long interval) {
+        mInterval = interval;
+        return this;
+    }
+
+    public CubePager setDuration(int duration) {
+        this.mDuration = duration;
+        return this;
+    }
+
+    public CubePager setAutoMove(boolean autoMove) {
+        mAutoMove = autoMove;
+        return this;
     }
 }
