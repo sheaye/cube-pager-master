@@ -2,13 +2,14 @@ package com.sheaye.sample;
 
 import android.content.Context;
 import android.content.res.TypedArray;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.SeekBar;
+import android.widget.TextView;
 
 import com.sheaye.widget.CubePager;
 import com.sheaye.widget.CubePagerAdapter;
@@ -17,36 +18,63 @@ import com.sheaye.widget.DotsLayout;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity {
+import butterknife.BindView;
+import butterknife.ButterKnife;
 
-    protected CubePager mCubePager;
-    protected DotsLayout mDotsLayout;
+public class MainActivity extends AppCompatActivity{
+
     protected PicAdapter mPagerAdapter;
+    @BindView(R.id.m_cube_pager)
+    CubePager mCubePager;
+    @BindView(R.id.m_dots_layout)
+    DotsLayout mDotsLayout;
+    @BindView(R.id.m_seek_bar)
+    SeekBar mSeekBar;
+    @BindView(R.id.m_items_count_text)
+    TextView mItemsCountText;
+    protected List<Integer> mPicList = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        mCubePager = ((CubePager) findViewById(R.id.m_cube_pager));
-        mDotsLayout = ((DotsLayout) findViewById(R.id.m_dots_layout));
+        ButterKnife.bind(this);
         mCubePager.setAutoMove(true);
-        mPagerAdapter = new PicAdapter(this);
+        mPagerAdapter = new PicAdapter(this, mPicList);
         mCubePager.setAdapter(mPagerAdapter);
         mDotsLayout.setUpWithCubePager(mCubePager);
+        mSeekBar.setOnSeekBarChangeListener(new OnProgressChangeListener());
+    }
 
-        List<Integer> picList = new ArrayList<>();
-        TypedArray typedArray = getResources().obtainTypedArray(R.array.pictures);
-        for (int i = 0; i < typedArray.length(); i++) {
-            picList.add(typedArray.getResourceId(i, 0));
+    private class OnProgressChangeListener implements SeekBar.OnSeekBarChangeListener{
+
+        @Override
+        public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+            mItemsCountText.setText(String.valueOf(progress));
+            mPicList.clear();
+            TypedArray typedArray = getResources().obtainTypedArray(R.array.pictures);
+            for (int i = 0; i < progress; i++) {
+                mPicList.add(typedArray.getResourceId(i, 0));
+            }
+            typedArray.recycle();
+            mPagerAdapter.notifyDataSetChanged();
         }
-        typedArray.recycle();
-        mPagerAdapter.addAll(picList);
+
+        @Override
+        public void onStartTrackingTouch(SeekBar seekBar) {
+
+        }
+
+        @Override
+        public void onStopTrackingTouch(SeekBar seekBar) {
+
+        }
     }
 
     class PicAdapter extends CubePagerAdapter<Integer> {
 
-        public PicAdapter(Context context) {
-            super(context);
+        public PicAdapter(Context mContext, List<Integer> mData) {
+            super(mContext, mData);
         }
 
         @Override
@@ -54,7 +82,7 @@ public class MainActivity extends AppCompatActivity {
             ImageView imageView;
             if (convertView != null) {
                 imageView = (ImageView) convertView;
-            }else {
+            } else {
                 imageView = new ImageView(mContext);
                 imageView.setScaleType(ImageView.ScaleType.CENTER);
                 imageView.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
