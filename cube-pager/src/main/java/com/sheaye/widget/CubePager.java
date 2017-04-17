@@ -100,7 +100,6 @@ public class CubePager extends ViewGroup {
         mTouchSlop = ViewConfiguration.get(context).getScaledDoubleTapSlop();
         float density = context.getResources().getDisplayMetrics().density;
         mMinVelocity = MIN_FLING_VELOCITY * density;
-        Log.e(TAG, "minVelocity = " + mMinVelocity);
     }
 
     //  onMeasure决定View本身和它的内容的尺寸
@@ -231,7 +230,7 @@ public class CubePager extends ViewGroup {
 //      此时可视页面的实际位置已经发生变化（从3-->2或者从1-->2）,需要回到0位置，这里伪造一个持续滚动的假象
         int duration = ((int) (mDuration * Math.abs(startX * 1.f / mWidth)));
         mScroller.startScroll(startX, 0, -startX, 0, duration);
-//        Log.e(TAG, "startX = " + startX + ", duration = " + duration);
+//        log("startX = " + startX + ", duration = " + duration);
         invalidate();
     }
 
@@ -304,7 +303,7 @@ public class CubePager extends ViewGroup {
 //          页面左滑由1翻转到2时，页面1的旋转角度由0到-mMaxRotate，页面2的旋转角度由MAX_ROTATE到0
 //          页面右滑由1翻转到0时，页面0的旋转角度由-MAX_ROTATE到0，页面1的旋转角度由0到+mMaxRotate
             float rotate = (i - 1 - interpolation) * mMaxRotate;
-//            Log.e(TAG, "position = " + i + ", left = " + left + ", right = " + right + ", rotate = " + rotate + ", scrollX = " + scrollX);
+//            log("position = " + i + ", left = " + left + ", right = " + right + ", rotate = " + rotate + ", scrollX = " + scrollX);
 
             mCamera.save();
             mCamera.rotateY(rotate);
@@ -441,5 +440,11 @@ public class CubePager extends ViewGroup {
     public CubePager setTouchSlop(int touchSlop) {
         mTouchSlop = touchSlop;
         return this;
+    }
+
+    private void log(String message) {
+        if (BuildConfig.DEBUG) {
+            Log.d(TAG, message);
+        }
     }
 }
