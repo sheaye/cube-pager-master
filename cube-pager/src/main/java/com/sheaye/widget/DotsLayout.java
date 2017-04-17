@@ -51,7 +51,7 @@ public class DotsLayout extends LinearLayout implements CubePager.OnPageChangeLi
         }
         mObserver = new DotsObserver();
         pagerAdapter.registerDataSetObserver(mObserver);
-        mCubePager.setOnPageChangeListener(this);
+        mCubePager.addOnPageChangeListener(this);
         onDataSetChanged();
     }
 

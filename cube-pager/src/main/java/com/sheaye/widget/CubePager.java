@@ -17,6 +17,7 @@ import android.view.ViewParent;
 import android.view.animation.Interpolator;
 import android.widget.Scroller;
 
+import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -26,6 +27,11 @@ import java.util.TimerTask;
 
 public class CubePager extends ViewGroup {
 
+    public interface OnPageChangeListener {
+        void onPageChanged(int currentPosition, int oldPosition);
+    }
+
+    private ArrayList<OnPageChangeListener> mOnPageChangeListeners;
     private static final String TAG = "CubePager";
     private static final int SCROLL_TO_LEFT = 1;
     private static final int SCROLL_TO_RIGHT = -1;
@@ -188,8 +194,14 @@ public class CubePager extends ViewGroup {
         if (scrollDirect != 0) {
             int oldPosition = mPositions[CURRENT];
             adjustViews(scrollDirect);
-            if (mOnPageChangeListener != null) {
-                mOnPageChangeListener.onPageChanged(mPositions[CURRENT], oldPosition);
+            int currentPosition = mPositions[CURRENT];
+            if (mOnPageChangeListeners != null) {
+                for (int i = 0; i < mOnPageChangeListeners.size(); i++) {
+                    OnPageChangeListener listener = mOnPageChangeListeners.get(i);
+                    if (listener!=null) {
+                        listener.onPageChanged(currentPosition,oldPosition);
+                    }
+                }
             }
         }
 //      mScrollDirect 左滑1,右滑-1,其他0
@@ -317,14 +329,17 @@ public class CubePager extends ViewGroup {
         }
     }
 
-    public interface OnPageChangeListener {
-        void onPageChanged(int currentPosition, int oldPosition);
+    public void addOnPageChangeListener(OnPageChangeListener onPageChangeListener) {
+        if (mOnPageChangeListeners == null) {
+            mOnPageChangeListeners = new ArrayList<>();
+        }
+        mOnPageChangeListeners.add(onPageChangeListener);
     }
 
-    private OnPageChangeListener mOnPageChangeListener;
-
-    public void setOnPageChangeListener(OnPageChangeListener onPageChangeListener) {
-        mOnPageChangeListener = onPageChangeListener;
+    public void removeOnPageChangeListener(OnPageChangeListener onPageChangeListener) {
+        if (mOnPageChangeListeners != null) {
+            mOnPageChangeListeners.remove(onPageChangeListener);
+        }
     }
 
     public int getItemsCount() {
