@@ -29,6 +29,8 @@ import java.util.TimerTask;
 
 public class CubePager extends ViewGroup {
 
+    protected float mDownY;
+
     public interface OnPageChangeListener {
 
         void onPageChanged(int currentPosition, int oldPosition);
@@ -56,7 +58,7 @@ public class CubePager extends ViewGroup {
     private float mDownX;
     private int mTouchSlop;
     private float mLastMoveX;
-    private float mMoveX;
+    private float moveX;
     private int mWidth;
     private int mHeight;
     private Camera mCamera;
@@ -147,13 +149,17 @@ public class CubePager extends ViewGroup {
                     stopTimer();
                 }
                 mDownX = ev.getRawX();
+                mDownY = ev.getRawY();
                 mLastMoveX = mDownX;
+                requestParentDisallowIntercept(true);
                 break;
             case MotionEvent.ACTION_MOVE:
-                mMoveX = ev.getRawX();
-                float delta = Math.abs(mMoveX - mDownX);
-                mLastMoveX = mMoveX;
-                if (delta > mTouchSlop) {
+                float moveX = ev.getRawX();
+                float moveY = ev.getRawY();
+                float deltaX = Math.abs(moveX - mDownX);
+                float deltaY = Math.abs(moveY - mDownY);
+                mLastMoveX = moveX;
+                if (deltaX > deltaY || deltaX > mTouchSlop) {
                     requestParentDisallowIntercept(true);
                     return true;
                 }

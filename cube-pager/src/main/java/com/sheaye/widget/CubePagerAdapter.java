@@ -3,7 +3,6 @@ package com.sheaye.widget;
 import android.content.Context;
 import android.database.DataSetObservable;
 import android.database.DataSetObserver;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,7 +19,7 @@ import java.util.List;
 public abstract class CubePagerAdapter<T> {
 
     protected Context mContext;
-    private List<T> mData;
+    protected List<T> mData;
     private DataSetObserver mObserver;
     private DataSetObservable mObservable = new DataSetObservable();
     private View mConvertView;
