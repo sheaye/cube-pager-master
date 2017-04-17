@@ -49,7 +49,9 @@ class PicAdapter extends CubePagerAdapter<Integer> {
 ```
 mPagerAdapter = new PicAdapter(this, mPicList);
         mCubePager
-                .setAutoMove(true) // 设置自动翻页
+                .setWith3D(true) // 设置是否显示3D效果
+                .setTouchSlop(100) // 设置最小滑动距离，超过这个距离开始拖动
+                .setAutoMove(true) // 设置自动翻页
                 .setMaxRotate(50) // 设置旋转的最大夹角
                 .setInterval(4000) // 设置翻页间隔时间，仅自动翻页为true时有效
                 .setDuration(2000) // 设置翻页持续时间，仅自动翻页为true时有效
