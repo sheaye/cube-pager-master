@@ -7,9 +7,11 @@ import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.os.Handler;
 import android.os.Message;
+import android.support.v4.view.VelocityTrackerCompat;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
+import android.view.VelocityTracker;
 import android.view.View;
 import android.view.ViewConfiguration;
 import android.view.ViewGroup;
@@ -28,9 +30,15 @@ import java.util.TimerTask;
 public class CubePager extends ViewGroup {
 
     public interface OnPageChangeListener {
+
         void onPageChanged(int currentPosition, int oldPosition);
+
     }
 
+    private static final int MIN_FLING_VELOCITY = 400; // dips
+    private int mActivePointerId;
+    private float mMinVelocity;
+    private VelocityTracker mVelocityTracker;
     private ArrayList<OnPageChangeListener> mOnPageChangeListeners;
     private static final String TAG = "CubePager";
     private static final int SCROLL_TO_LEFT = 1;
@@ -90,6 +98,9 @@ public class CubePager extends ViewGroup {
         mMatrix = new Matrix();
         mCamera = new Camera();
         mTouchSlop = ViewConfiguration.get(context).getScaledDoubleTapSlop();
+        float density = context.getResources().getDisplayMetrics().density;
+        mMinVelocity = MIN_FLING_VELOCITY * density;
+        Log.e(TAG, "minVelocity = " + mMinVelocity);
     }
 
     //  onMeasure决定View本身和它的内容的尺寸
@@ -163,6 +174,11 @@ public class CubePager extends ViewGroup {
     public boolean onTouchEvent(MotionEvent event) {
         int scrollDirect;
         float curX = event.getRawX();
+        if (mVelocityTracker == null) {
+            mVelocityTracker = VelocityTracker.obtain();
+        }
+        mVelocityTracker.addMovement(event);
+        mActivePointerId = event.getPointerId(0);
         switch (event.getAction()) {
             case MotionEvent.ACTION_MOVE:
                 float deltaX = (mLastMoveX - curX);
@@ -172,7 +188,13 @@ public class CubePager extends ViewGroup {
                 break;
             case MotionEvent.ACTION_UP:
                 int dist = ((int) (curX - mDownX));
-                if (Math.abs(dist) > mWidth / 2) {
+                mVelocityTracker.computeCurrentVelocity(1000);
+                float xVelocity = VelocityTrackerCompat.getXVelocity(mVelocityTracker, mActivePointerId);
+                if (mVelocityTracker != null) {
+                    mVelocityTracker.recycle();
+                    mVelocityTracker = null;
+                }
+                if (Math.abs(dist) > mWidth / 2 || Math.abs(xVelocity) > mMinVelocity) {
                     if (dist < 0) {// 滑到右边一页
                         scrollDirect = SCROLL_TO_RIGHT;
                     } else {
@@ -198,8 +220,8 @@ public class CubePager extends ViewGroup {
             if (mOnPageChangeListeners != null) {
                 for (int i = 0; i < mOnPageChangeListeners.size(); i++) {
                     OnPageChangeListener listener = mOnPageChangeListeners.get(i);
-                    if (listener!=null) {
-                        listener.onPageChanged(currentPosition,oldPosition);
+                    if (listener != null) {
+                        listener.onPageChanged(currentPosition, oldPosition);
                     }
                 }
             }
@@ -260,7 +282,7 @@ public class CubePager extends ViewGroup {
     protected void dispatchDraw(Canvas canvas) {
         if (mWith3D) {
             drawWith3D(canvas);
-        }else {
+        } else {
             super.dispatchDraw(canvas);
         }
     }
@@ -411,8 +433,13 @@ public class CubePager extends ViewGroup {
         return this;
     }
 
-    public CubePager setWith3D(boolean with3D){
+    public CubePager setWith3D(boolean with3D) {
         mWith3D = with3D;
+        return this;
+    }
+
+    public CubePager setTouchSlop(int touchSlop) {
+        mTouchSlop = touchSlop;
         return this;
     }
 }
