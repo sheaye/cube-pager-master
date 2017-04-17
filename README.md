@@ -15,9 +15,9 @@
 1. 在布局文件中定义CubePager:
 ```
 <com.sheaye.widget.CubePager
-            android:id="@+id/m_cube_pager"
-            android:layout_width="match_parent"
-            android:layout_height="250dp"/>
+    android:id="@+id/m_cube_pager"
+    android:layout_width="match_parent"
+    android:layout_height="250dp"/>
 ```
 2. 继承CubePagerAdapter<T>，T为bean的类型，声明构造方法，重写getItemView方法，例如：
 ```
@@ -41,7 +41,7 @@ class PicAdapter extends CubePagerAdapter<Integer> {
             imageView.setImageResource(item);
             return imageView;
         }
-    }
+}
 ```
 3. 设置CubePager的特性，设置适配器：
 ```
@@ -49,13 +49,30 @@ mPagerAdapter = new PicAdapter(this, mPicList);
         mCubePager
                 .setAutoMove(true) // 设置自动翻页
                 .setMaxRotate(50) // 设置旋转的最大夹角
-                .setInterval(4000) // 设置翻页间隔时间，自动翻页为true有效
-                .setDuration(2000) // 设置翻页持续时间，仅自动翻页为true有效
+                .setInterval(4000) // 设置翻页间隔时间，仅自动翻页为true时有效
+                .setDuration(2000) // 设置翻页持续时间，仅自动翻页为true时有效
                 .setAdapter(mPagerAdapter);
 
         mDotsLayout.setUpWithCubePager(mCubePager);
-        mSeekBar.setOnSeekBarChangeListener(new OnProgressChangeListener());
 ```
+4. 设置DotsLayout,添加小圆点容器
+
+xml布局：dot_selector可以为小圆点设置selector
+```
+<com.sheaye.widget.DotsLayout
+    android:id="@+id/m_dots_layout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingBottom="10dp"
+    android:layout_gravity="bottom"
+    app:dot_selector="@drawable/selector_dot"/>
+```
+关联CubePager：需要在CubePager设置Adapter之后关联，使用了CubePager的OnPageChangeListener
+```
+mDotsLayout.setUpWithCubePager(mCubePager);
+```
+5. 更多使用详情，请参照sample
+
 ## 参考链接：
 
 https://www.ibm.com/developerworks/cn/opensource/os-cn-android-anmt2/index.html?ca=drs-
