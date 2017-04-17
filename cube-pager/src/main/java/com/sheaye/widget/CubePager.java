@@ -218,14 +218,7 @@ public class CubePager extends ViewGroup {
     private void insertView(int index) {
         View child = mPagerAdapter.instantiateItem(this, mPositions[index]);
         if (child != null) {
-            ViewParent parent = child.getParent();
-            if (parent != null) {
-                ((ViewGroup) parent).removeView(child);
-            }
-            Log.e(TAG, "addView(" + index + "/" + getChildCount() + ")");
-            if (index <= getChildCount()) {
-                addView(child, index);
-            }
+            addView(child, index);
         }
     }
 
@@ -350,6 +343,7 @@ public class CubePager extends ViewGroup {
         for (int i = 0; i < mPositions.length; i++) {
             insertView(i);
         }
+        requestLayout();
         if (mAutoMove) {
             startTimer();
         }
