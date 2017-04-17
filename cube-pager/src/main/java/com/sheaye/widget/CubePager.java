@@ -73,7 +73,7 @@ public class CubePager extends ViewGroup {
     private static final int LEFT = 0;
     private static final int CURRENT = 1;
     private static final int RIGHT = 2;
-
+    private boolean mWith3D = true;
     private int[] mPositions;
 
     public CubePager(Context context) {
@@ -258,6 +258,14 @@ public class CubePager extends ViewGroup {
 
     @Override
     protected void dispatchDraw(Canvas canvas) {
+        if (mWith3D) {
+            drawWith3D(canvas);
+        }else {
+            super.dispatchDraw(canvas);
+        }
+    }
+
+    private void drawWith3D(Canvas canvas) {
         mMatrix.reset();
         int scrollX = getScrollX();
         float interpolation = scrollX * 1f / mWidth;
@@ -400,6 +408,11 @@ public class CubePager extends ViewGroup {
 
     public CubePager setAutoMove(boolean autoMove) {
         mAutoMove = autoMove;
+        return this;
+    }
+
+    public CubePager setWith3D(boolean with3D){
+        mWith3D = with3D;
         return this;
     }
 }
