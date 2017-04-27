@@ -9,11 +9,9 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.v4.view.VelocityTrackerCompat;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.VelocityTracker;
 import android.view.View;
-import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.view.ViewParent;
 import android.view.animation.Interpolator;
@@ -56,9 +54,7 @@ public class CubePager extends ViewGroup {
     };
     private Scroller mScroller;
     private float mDownX;
-    private int mTouchSlop;
     private float mLastMoveX;
-    private float moveX;
     private int mWidth;
     private int mHeight;
     private Camera mCamera;
@@ -99,7 +95,6 @@ public class CubePager extends ViewGroup {
         mScroller = new Scroller(context, mInterpolator);
         mMatrix = new Matrix();
         mCamera = new Camera();
-        mTouchSlop = ViewConfiguration.get(context).getScaledDoubleTapSlop();
         float density = context.getResources().getDisplayMetrics().density;
         mMinVelocity = MIN_FLING_VELOCITY * density;
     }
@@ -459,14 +454,4 @@ public class CubePager extends ViewGroup {
         return this;
     }
 
-    public CubePager setTouchSlop(int touchSlop) {
-        mTouchSlop = touchSlop;
-        return this;
-    }
-
-    private void log(String message) {
-        if (BuildConfig.DEBUG) {
-            Log.d(TAG, message);
-        }
-    }
 }

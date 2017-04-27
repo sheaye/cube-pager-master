@@ -47,10 +47,9 @@ public class MainActivity extends AppCompatActivity {
         mCubePager
                 .setWith3D(false) // 设置手否显示三维效果，默认为true
                 .setAutoMove(true) // 设置自动翻页
-                .setMaxRotate(50) // 设置旋转的最大夹角
+                .setMaxRotate(50) // 设置两个旋转页面的最大夹角
                 .setInterval(4000) // 设置翻页间隔时间，自动翻页为true有效
                 .setDuration(2000) // 设置翻页持续时间，仅自动翻页为true有效
-                .setTouchSlop(100) // 设置最小滑动距离
                 .setAdapter(mPagerAdapter);
 
         mDotsLayout.setUpWithCubePager(mCubePager);
