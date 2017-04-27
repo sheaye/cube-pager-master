@@ -107,6 +107,17 @@ public class CubePager extends ViewGroup {
     //  onMeasure决定View本身和它的内容的尺寸
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        if (getLayoutParams().height == LayoutParams.WRAP_CONTENT) {
+            for (int i = 0; i < getChildCount(); i++) {
+                View child = getChildAt(i);
+                child.measure(widthMeasureSpec, MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED));
+                int h = child.getMeasuredHeight();
+                if (h > mHeight) {
+                    mHeight = h;
+                }
+                heightMeasureSpec = MeasureSpec.makeMeasureSpec(mHeight, MeasureSpec.EXACTLY);
+            }
+        }
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
         mWidth = getMeasuredWidth();
         mHeight = getMeasuredHeight();
@@ -159,9 +170,11 @@ public class CubePager extends ViewGroup {
                 float deltaX = Math.abs(moveX - mDownX);
                 float deltaY = Math.abs(moveY - mDownY);
                 mLastMoveX = moveX;
-                if (deltaX > deltaY || deltaX > mTouchSlop) {
+                if (deltaX > deltaY) {
                     requestParentDisallowIntercept(true);
                     return true;
+                } else {
+                    requestParentDisallowIntercept(false);
                 }
                 break;
         }
@@ -177,6 +190,9 @@ public class CubePager extends ViewGroup {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
+        if (getChildCount() == 0) {
+            return false;
+        }
         int scrollDirect;
         float curX = event.getRawX();
         if (mVelocityTracker == null) {
