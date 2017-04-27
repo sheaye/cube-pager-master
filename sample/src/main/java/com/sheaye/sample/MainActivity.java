@@ -45,7 +45,7 @@ public class MainActivity extends AppCompatActivity {
 
         mPagerAdapter = new PicAdapter(this, mPicList);
         mCubePager
-                .setWith3D(false) // 设置手否显示三维效果，默认为true
+                .setWith3D(true) // 设置手否显示三维效果，默认为true
                 .setAutoMove(true) // 设置自动翻页
                 .setMaxRotate(50) // 设置两个旋转页面的最大夹角
                 .setInterval(4000) // 设置翻页间隔时间，自动翻页为true有效
