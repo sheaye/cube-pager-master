@@ -38,11 +38,7 @@ public class DotsLayout extends LinearLayout implements CubePager.OnPageChangeLi
         typedArray.recycle();
     }
 
-    /**
-     * 因为这里直接使用adapter作为Observable,请在CubePager.setAdapter之后使用此方法
-     *
-     * @param cubePager
-     */
+    // 因为这里直接使用adapter作为Observable,请在CubePager.setAdapter之后使用此方法
     public void setUpWithCubePager(CubePager cubePager) {
         mCubePager = cubePager;
         CubePagerAdapter pagerAdapter = mCubePager.getPagerAdapter();
