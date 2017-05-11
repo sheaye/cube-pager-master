@@ -12,7 +12,10 @@
 7. 集成小圆点容器控件，关联CubePager即可。
 
 ## 使用
-1. 在module的build.gradle文件中添加依赖：compile 'com.sheaye:cube-pager:1.0.0'
+1. 在module的build.gradle文件中添加依赖：
+```
+compile 'com.sheaye:cube-pager:1.0.0'
+```
 
 2. 在布局文件中定义CubePager:
 ```
