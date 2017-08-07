@@ -5,13 +5,13 @@ def prop = new Properties()
 prop.load(file('../local.properties').newDataInputStream())
 
 publish {
-    userOrg = 'sheaye'//bintray用户名g
-    groupId = 'com.sheaye'// jcener上的路径
+    userOrg = 'shareye'//bintray用户名g
+    groupId = 'com.shareye'// jcener上的路径
     artifactId = 'cube-pager'//项目名
-    publishVersion = '1.0.0'//版本号
+    publishVersion = '1.0.1'//版本号
     desc = 'Oh hi, this is a nice description for a project, right?'
     website = 'https://github.com/sheaye/cube-pager-master'
-    bintrayUser = 'sheaye'
+    bintrayUser = 'shareye'
     dryRun = false
     bintrayKey = prop.getProperty("BINTRAY_KEY")
 }

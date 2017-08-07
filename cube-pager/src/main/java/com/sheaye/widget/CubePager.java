@@ -196,6 +196,9 @@ public class CubePager extends ViewGroup {
         mVelocityTracker.addMovement(event);
         mActivePointerId = event.getPointerId(0);
         switch (event.getAction()) {
+            case MotionEvent.ACTION_DOWN:
+                stopTimer();
+                break;
             case MotionEvent.ACTION_MOVE:
                 float deltaX = (mLastMoveX - curX);
                 scrollBy(((int) deltaX), 0);
@@ -351,9 +354,10 @@ public class CubePager extends ViewGroup {
     }
 
     public void stopTimer() {
-        if (mTimer != null) {
-            mTimer.cancel();
+        if (mTimer == null) {
+            return;
         }
+        mTimer.cancel();
         mTimer = null;
     }
 
@@ -367,12 +371,15 @@ public class CubePager extends ViewGroup {
     }
 
     @Override
+    protected void onAttachedToWindow() {
+        super.onAttachedToWindow();
+        startTimer();
+    }
+
+    @Override
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
-        if (mTimer != null) {
-            mTimer.cancel();
-            mTimer = null;
-        }
+        stopTimer();
     }
 
     public void addOnPageChangeListener(OnPageChangeListener onPageChangeListener) {
@@ -394,7 +401,6 @@ public class CubePager extends ViewGroup {
 
     //  数据变化，界面更新
     public void onDataSetChanged() {
-        stopTimer();
         removeAllViews();
         mItemsCount = mPagerAdapter.getCount();
         if (mItemsCount == 0) {
@@ -405,9 +411,6 @@ public class CubePager extends ViewGroup {
             insertView(i);
         }
         requestLayout();
-        if (mAutoMove) {
-            startTimer();
-        }
     }
 
     private void initPositions() {
